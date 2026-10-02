@@ -1,0 +1,1051 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Catatan Usaha Pulsa</title>
+
+<style>
+*{box-sizing:border-box}
+body{
+ margin:0;
+ font-family:Arial,sans-serif;
+ background:#f1f5f9;
+ color:#111827
+}
+header{
+ background:#2563eb;
+ color:white;
+ padding:18px;
+ text-align:center
+}
+header h2{margin:0}
+nav{
+ display:flex;
+ overflow:auto;
+ background:white;
+ position:sticky;
+ top:0;
+ z-index:5;
+ box-shadow:0 2px 5px #ddd
+}
+nav button{
+ flex:1;
+ min-width:90px;
+ padding:13px 6px;
+ border:0;
+ background:white;
+ font-weight:bold;
+ cursor:pointer
+}
+nav button.active{
+ color:#2563eb;
+ border-bottom:3px solid #2563eb
+}
+.page{
+ display:none;
+ padding:15px;
+ max-width:800px;
+ margin:auto
+}
+.page.active{display:block}
+.card{
+ background:white;
+ padding:15px;
+ margin-bottom:15px;
+ border-radius:12px;
+ box-shadow:0 2px 7px #ddd
+}
+.grid{
+ display:grid;
+ grid-template-columns:1fr 1fr;
+ gap:10px
+}
+.stat{
+ background:white;
+ padding:15px;
+ border-radius:10px;
+ box-shadow:0 2px 7px #ddd
+}
+.stat b{
+ display:block;
+ font-size:18px;
+ margin-top:8px;
+ color:#2563eb
+}
+input,select{
+ width:100%;
+ padding:12px;
+ margin:5px 0 9px;
+ border:1px solid #ccc;
+ border-radius:7px;
+ font-size:15px
+}
+button{
+ cursor:pointer
+}
+.btn{
+ width:100%;
+ padding:12px;
+ border:0;
+ border-radius:7px;
+ color:white;
+ font-weight:bold;
+ margin-top:5px
+}
+.blue{background:#2563eb}
+.green{background:#16a34a}
+.red{background:#dc2626}
+.orange{background:#f59e0b}
+.gray{background:#6b7280}
+.item{
+ background:#f8fafc;
+ border:1px solid #e5e7eb;
+ padding:12px;
+ margin:8px 0;
+ border-radius:8px
+}
+.actions{
+ display:flex;
+ gap:6px;
+ margin-top:8px
+}
+.actions button{
+ padding:7px 10px;
+ border:0;
+ border-radius:5px;
+ color:white
+}
+table{
+ width:100%;
+ border-collapse:collapse
+}
+th,td{
+ padding:9px;
+ border-bottom:1px solid #ddd;
+ text-align:left;
+ font-size:13px
+}
+.scroll{
+ overflow-x:auto
+}
+.total{
+ font-size:22px;
+ font-weight:bold;
+ color:#2563eb
+}
+.laba{
+ color:#16a34a
+}
+.rugi{
+ color:#dc2626
+}
+.small{
+ color:#64748b;
+ font-size:13px
+}
+</style>
+</head>
+
+<body>
+
+<header>
+<h2>📱 Catatan Usaha Pulsa</h2>
+<p>Kelola usaha dengan mudah</p>
+</header>
+
+<nav>
+<button class="menu active" data-page="dashboard">🏠 Dashboard</button>
+<button class="menu" data-page="deposit">💳 Deposit</button>
+<button class="menu" data-page="pengeluaran">💸 Pengeluaran</button>
+<button class="menu" data-page="penjualan">📱 Penjualan</button>
+<button class="menu" data-page="utang">📒 Utang</button>
+<button class="menu" data-page="harian">📅 Harian</button>
+<button class="menu" data-page="laba">📊 Laba</button>
+</nav>
+
+
+<!-- DASHBOARD -->
+
+<section id="dashboard" class="page active">
+
+<div class="grid">
+
+<div class="stat">
+<small>Saldo Deposit</small>
+<b id="dDeposit">Rp0</b>
+</div>
+
+<div class="stat">
+<small>Penjualan</small>
+<b id="dPenjualan">Rp0</b>
+</div>
+
+<div class="stat">
+<small>Pengeluaran</small>
+<b id="dPengeluaran">Rp0</b>
+</div>
+
+<div class="stat">
+<small>Utang</small>
+<b id="dUtang">Rp0</b>
+</div>
+
+</div>
+
+<div class="card">
+<h3>💰 Laba Bersih</h3>
+<div class="total laba" id="dLaba">Rp0</div>
+</div>
+
+<div class="card">
+<h3>📌 Jumlah Transaksi</h3>
+<p>Penjualan: <b id="dJumlahJual">0</b></p>
+<p>Deposit: <b id="dJumlahDeposit">0</b></p>
+<p>Pengeluaran: <b id="dJumlahKeluar">0</b></p>
+<p>Utang: <b id="dJumlahUtang">0</b></p>
+</div>
+
+</section>
+
+
+<!-- DEPOSIT -->
+
+<section id="deposit" class="page">
+
+<div class="card">
+
+<h3>💳 Tambah Deposit</h3>
+
+<input id="depositKet"
+placeholder="Keterangan / Provider">
+
+<input id="depositJumlah"
+type="number"
+placeholder="Jumlah deposit">
+
+<button class="btn blue" onclick="tambahDeposit()">
+Simpan Deposit
+</button>
+
+</div>
+
+<div class="card">
+
+<h3>Riwayat Deposit</h3>
+
+<div id="listDeposit"></div>
+
+</div>
+
+</section>
+
+
+<!-- PENGELUARAN -->
+
+<section id="pengeluaran" class="page">
+
+<div class="card">
+
+<h3>💸 Tambah Pengeluaran</h3>
+
+<input id="keluarKet"
+placeholder="Keterangan">
+
+<input id="keluarJumlah"
+type="number"
+placeholder="Jumlah pengeluaran">
+
+<button class="btn blue" onclick="tambahPengeluaran()">
+Simpan Pengeluaran
+</button>
+
+</div>
+
+<div class="card">
+
+<h3>Riwayat Pengeluaran</h3>
+
+<div id="listPengeluaran"></div>
+
+</div>
+
+</section>
+
+
+<!-- PENJUALAN -->
+
+<section id="penjualan" class="page">
+
+<div class="card">
+
+<h3>📱 Tambah Penjualan</h3>
+
+<input id="jualNama"
+placeholder="Nama pelanggan">
+
+<input id="jualProduk"
+placeholder="Produk / Nominal pulsa">
+
+<input id="jualModal"
+type="number"
+placeholder="Modal">
+
+<input id="jualHarga"
+type="number"
+placeholder="Harga jual">
+
+<button class="btn blue" id="btnJual"
+onclick="simpanPenjualan()">
+Simpan Penjualan
+</button>
+
+<button class="btn gray"
+id="btnBatal"
+style="display:none"
+onclick="batalEdit()">
+Batal Edit
+</button>
+
+</div>
+
+<div class="card">
+
+<h3>📋 Riwayat Penjualan</h3>
+
+<div id="listPenjualan"></div>
+
+</div>
+
+</section>
+
+
+<!-- UTANG -->
+
+<section id="utang" class="page">
+
+<div class="card">
+
+<h3>📒 Tambah Utang</h3>
+
+<input id="utangNama"
+placeholder="Nama pelanggan">
+
+<input id="utangJumlah"
+type="number"
+placeholder="Jumlah utang">
+
+<button class="btn blue" onclick="tambahUtang()">
+Simpan Utang
+</button>
+
+</div>
+
+<div class="card">
+
+<h3>Daftar Utang</h3>
+
+<div id="listUtang"></div>
+
+</div>
+
+</section>
+
+
+<!-- REKAP HARIAN -->
+
+<section id="harian" class="page">
+
+<div class="card">
+
+<h3>📅 Rekap Harian</h3>
+
+<input id="tanggalRekap"
+type="date"
+onchange="tampilkanRekap()">
+
+</div>
+
+<div class="card">
+
+<p>Total Penjualan</p>
+<div class="total" id="hPenjualan">Rp0</div>
+
+<hr>
+
+<p>Total Modal</p>
+<div class="total" id="hModal">Rp0</div>
+
+<hr>
+
+<p>Laba Kotor</p>
+<div class="total laba" id="hLaba">Rp0</div>
+
+<hr>
+
+<p>Pengeluaran</p>
+<div class="total" id="hPengeluaran">Rp0</div>
+
+<hr>
+
+<p>Laba Bersih</p>
+<div class="total laba" id="hBersih">Rp0</div>
+
+</div>
+
+</section>
+
+
+<!-- LABA -->
+
+<section id="laba" class="page">
+
+<div class="card">
+
+<h3>📊 Semua Laba</h3>
+
+<p>Laba dari Penjualan</p>
+<div class="total laba" id="lPenjualan">Rp0</div>
+
+<hr>
+
+<p>Total Pengeluaran</p>
+<div class="total" id="lPengeluaran">Rp0</div>
+
+<hr>
+
+<p>🔥 LABA BERSIH</p>
+<div class="total laba" id="lBersih">Rp0</div>
+
+</div>
+
+</section>
+
+
+<script>
+
+/* DATA */
+
+let deposit =
+JSON.parse(localStorage.getItem("deposit") || "[]");
+
+let pengeluaran =
+JSON.parse(localStorage.getItem("pengeluaran") || "[]");
+
+let penjualan =
+JSON.parse(localStorage.getItem("penjualan") || "[]");
+
+let utang =
+JSON.parse(localStorage.getItem("utang") || "[]");
+
+let editIndex=-1;
+
+
+/* FORMAT */
+
+function rp(n){
+ return "Rp"+Number(n||0).toLocaleString("id-ID");
+}
+
+function tanggal(){
+ return new Date().toLocaleDateString("id-ID");
+}
+
+
+/* MENU */
+
+document.querySelectorAll(".menu").forEach(function(btn){
+
+ btn.onclick=function(){
+
+  document.querySelectorAll(".menu")
+  .forEach(function(x){
+   x.classList.remove("active");
+  });
+
+  document.querySelectorAll(".page")
+  .forEach(function(x){
+   x.classList.remove("active");
+  });
+
+  btn.classList.add("active");
+
+  document
+  .getElementById(btn.dataset.page)
+  .classList.add("active");
+
+  tampil();
+
+ };
+
+});
+
+
+/* SIMPAN */
+
+function save(){
+
+ localStorage.setItem(
+  "deposit",
+  JSON.stringify(deposit)
+ );
+
+ localStorage.setItem(
+  "pengeluaran",
+  JSON.stringify(pengeluaran)
+ );
+
+ localStorage.setItem(
+  "penjualan",
+  JSON.stringify(penjualan)
+ );
+
+ localStorage.setItem(
+  "utang",
+  JSON.stringify(utang)
+ );
+
+}
+
+
+/* DEPOSIT */
+
+function tambahDeposit(){
+
+ let ket=document
+ .getElementById("depositKet").value;
+
+ let jumlah=Number(document
+ .getElementById("depositJumlah").value);
+
+ if(!ket || jumlah<=0){
+  alert("Isi data deposit dulu");
+  return;
+ }
+
+ deposit.push({
+  ket:ket,
+  jumlah:jumlah,
+  tanggal:tanggal()
+ });
+
+ save();
+
+ document.getElementById("depositKet").value="";
+ document.getElementById("depositJumlah").value="";
+
+ tampil();
+
+ alert("Deposit berhasil disimpan");
+
+}
+
+
+function hapusDeposit(i){
+
+ if(confirm("Hapus deposit?")){
+
+  deposit.splice(i,1);
+
+  save();
+
+  tampil();
+
+ }
+
+}
+
+
+/* PENGELUARAN */
+
+function tambahPengeluaran(){
+
+ let ket=document
+ .getElementById("keluarKet").value;
+
+ let jumlah=Number(document
+ .getElementById("keluarJumlah").value);
+
+ if(!ket || jumlah<=0){
+  alert("Isi pengeluaran dulu");
+  return;
+ }
+
+ pengeluaran.push({
+  ket:ket,
+  jumlah:jumlah,
+  tanggal:tanggal()
+ });
+
+ save();
+
+ document.getElementById("keluarKet").value="";
+ document.getElementById("keluarJumlah").value="";
+
+ tampil();
+
+}
+
+
+function hapusPengeluaran(i){
+
+ if(confirm("Hapus pengeluaran?")){
+
+  pengeluaran.splice(i,1);
+
+  save();
+
+  tampil();
+
+ }
+
+}
+
+
+/* PENJUALAN */
+
+function simpanPenjualan(){
+
+ let nama=document
+ .getElementById("jualNama").value;
+
+ let produk=document
+ .getElementById("jualProduk").value;
+
+ let modal=Number(document
+ .getElementById("jualModal").value);
+
+ let harga=Number(document
+ .getElementById("jualHarga").value);
+
+ if(!nama || !produk || harga<=0){
+
+  alert("Isi semua data penjualan");
+
+  return;
+
+ }
+
+ let data={
+  nama:nama,
+  produk:produk,
+  modal:modal,
+  harga:harga,
+  laba:harga-modal,
+  tanggal:tanggal()
+ };
+
+ if(editIndex>=0){
+
+  penjualan[editIndex]=data;
+
+  editIndex=-1;
+
+  document.getElementById("btnJual")
+  .innerText="Simpan Penjualan";
+
+  document.getElementById("btnBatal")
+  .style.display="none";
+
+ }else{
+
+  penjualan.push(data);
+
+ }
+
+ save();
+
+ kosongForm();
+
+ tampil();
+
+}
+
+
+function editPenjualan(i){
+
+ let x=penjualan[i];
+
+ document.getElementById("jualNama")
+ .value=x.nama;
+
+ document.getElementById("jualProduk")
+ .value=x.produk;
+
+ document.getElementById("jualModal")
+ .value=x.modal;
+
+ document.getElementById("jualHarga")
+ .value=x.harga;
+
+ editIndex=i;
+
+ document.getElementById("btnJual")
+ .innerText="Simpan Perubahan";
+
+ document.getElementById("btnBatal")
+ .style.display="block";
+
+}
+
+
+function batalEdit(){
+
+ editIndex=-1;
+
+ kosongForm();
+
+ document.getElementById("btnJual")
+ .innerText="Simpan Penjualan";
+
+ document.getElementById("btnBatal")
+ .style.display="none";
+
+}
+
+
+function kosongForm(){
+
+ document.getElementById("jualNama").value="";
+ document.getElementById("jualProduk").value="";
+ document.getElementById("jualModal").value="";
+ document.getElementById("jualHarga").value="";
+
+}
+
+
+function hapusPenjualan(i){
+
+ if(confirm("Hapus penjualan?")){
+
+  penjualan.splice(i,1);
+
+  save();
+
+  tampil();
+
+ }
+
+}
+
+
+/* UTANG */
+
+function tambahUtang(){
+
+ let nama=document
+ .getElementById("utangNama").value;
+
+ let jumlah=Number(document
+ .getElementById("utangJumlah").value);
+
+ if(!nama || jumlah<=0){
+
+  alert("Isi data utang dulu");
+
+  return;
+
+ }
+
+ utang.push({
+  nama:nama,
+  jumlah:jumlah,
+  status:"Belum Lunas",
+  tanggal:tanggal()
+ });
+
+ save();
+
+ document.getElementById("utangNama").value="";
+ document.getElementById("utangJumlah").value="";
+
+ tampil();
+
+}
+
+
+function lunasi(i){
+
+ utang[i].status="Lunas";
+
+ save();
+
+ tampil();
+
+}
+
+
+function hapusUtang(i){
+
+ if(confirm("Hapus utang?")){
+
+  utang.splice(i,1);
+
+  save();
+
+  tampil();
+
+ }
+
+}
+
+
+/* TAMPILKAN SEMUA */
+
+function tampil(){
+
+ /* DEPOSIT */
+
+ let html="";
+
+ let totalDeposit=0;
+
+ deposit.forEach(function(x,i){
+
+  totalDeposit+=x.jumlah;
+
+  html+=
+  '<div class="item">'+
+  '<b>'+x.ket+'</b><br>'+
+  x.tanggal+'<br>'+
+  rp(x.jumlah)+
+  '<div class="actions">'+
+  '<button class="red" onclick="hapusDeposit('+i+')">Hapus</button>'+
+  '</div>'+
+  '</div>';
+
+ });
+
+ if(!html) html="<p>Belum ada deposit.</p>";
+
+ document.getElementById("listDeposit")
+ .innerHTML=html;
+
+
+ /* PENGELUARAN */
+
+ html="";
+
+ let totalKeluar=0;
+
+ pengeluaran.forEach(function(x,i){
+
+  totalKeluar+=x.jumlah;
+
+  html+=
+  '<div class="item">'+
+  '<b>'+x.ket+'</b><br>'+
+  x.tanggal+'<br>'+
+  rp(x.jumlah)+
+  '<div class="actions">'+
+  '<button class="red" onclick="hapusPengeluaran('+i+')">Hapus</button>'+
+  '</div>'+
+  '</div>';
+
+ });
+
+ if(!html) html="<p>Belum ada pengeluaran.</p>";
+
+ document.getElementById("listPengeluaran")
+ .innerHTML=html;
+
+
+ /* PENJUALAN */
+
+ html="";
+
+ let totalJual=0;
+ let totalModal=0;
+ let totalLaba=0;
+
+ penjualan.forEach(function(x,i){
+
+  totalJual+=x.harga;
+  totalModal+=x.modal;
+  totalLaba+=x.laba;
+
+  html+=
+  '<div class="item">'+
+  '<b>'+x.nama+'</b><br>'+
+  x.produk+'<br>'+
+  x.tanggal+'<br>'+
+  'Modal: '+rp(x.modal)+'<br>'+
+  'Jual: '+rp(x.harga)+'<br>'+
+  '<b>Laba: '+rp(x.laba)+'</b>'+
+  '<div class="actions">'+
+  '<button class="orange" onclick="editPenjualan('+i+')">Edit</button>'+
+  '<button class="red" onclick="hapusPenjualan('+i+')">Hapus</button>'+
+  '</div>'+
+  '</div>';
+
+ });
+
+ if(!html) html="<p>Belum ada penjualan.</p>";
+
+ document.getElementById("listPenjualan")
+ .innerHTML=html;
+
+
+ /* UTANG */
+
+ html="";
+
+ let totalUtang=0;
+
+ utang.forEach(function(x,i){
+
+  if(x.status!="Lunas"){
+   totalUtang+=x.jumlah;
+  }
+
+  html+=
+  '<div class="item">'+
+  '<b>'+x.nama+'</b><br>'+
+  rp(x.jumlah)+'<br>'+
+  'Status: '+x.status+
+  '<div class="actions">'+
+  (x.status!="Lunas"
+   ? '<button class="green" onclick="lunasi('+i+')">Lunas</button>'
+   : '')+
+  '<button class="red" onclick="hapusUtang('+i+')">Hapus</button>'+
+  '</div>'+
+  '</div>';
+
+ });
+
+ if(!html) html="<p>Belum ada utang.</p>";
+
+ document.getElementById("listUtang")
+ .innerHTML=html;
+
+
+ /* DASHBOARD */
+
+ document.getElementById("dDeposit")
+ .innerText=rp(totalDeposit);
+
+ document.getElementById("dPenjualan")
+ .innerText=rp(totalJual);
+
+ document.getElementById("dPengeluaran")
+ .innerText=rp(totalKeluar);
+
+ document.getElementById("dUtang")
+ .innerText=rp(totalUtang);
+
+ document.getElementById("dLaba")
+ .innerText=rp(totalLaba-totalKeluar);
+
+ document.getElementById("dJumlahJual")
+ .innerText=penjualan.length;
+
+ document.getElementById("dJumlahDeposit")
+ .innerText=deposit.length;
+
+ document.getElementById("dJumlahKeluar")
+ .innerText=pengeluaran.length;
+
+ document.getElementById("dJumlahUtang")
+ .innerText=utang.length;
+
+
+ /* LABA */
+
+ document.getElementById("lPenjualan")
+ .innerText=rp(totalLaba);
+
+ document.getElementById("lPengeluaran")
+ .innerText=rp(totalKeluar);
+
+ document.getElementById("lBersih")
+ .innerText=rp(totalLaba-totalKeluar);
+
+
+ tampilkanRekap();
+
+}
+
+
+/* REKAP HARIAN */
+
+function tampilkanRekap(){
+
+ let tanggalDipilih=
+ document.getElementById("tanggalRekap").value;
+
+ if(!tanggalDipilih){
+
+  document.getElementById("hPenjualan")
+  .innerText="Rp0";
+
+  document.getElementById("hModal")
+  .innerText="Rp0";
+
+  document.getElementById("hLaba")
+  .innerText="Rp0";
+
+  document.getElementById("hPengeluaran")
+  .innerText="Rp0";
+
+  document.getElementById("hBersih")
+  .innerText="Rp0";
+
+  return;
+
+ }
+
+ let d=new Date(tanggalDipilih+"T00:00:00");
+
+ let tanggalIndonesia=
+ d.toLocaleDateString("id-ID");
+
+ let jual=0;
+ let modal=0;
+ let laba=0;
+ let keluar=0;
+
+ penjualan.forEach(function(x){
+
+  if(x.tanggal==tanggalIndonesia){
+
+   jual+=x.harga;
+   modal+=x.modal;
+   laba+=x.laba;
+
+  }
+
+ });
+
+ pengeluaran.forEach(function(x){
+
+  if(x.tanggal==tanggalIndonesia){
+
+   keluar+=x.jumlah;
+
+  }
+
+ });
+
+ document.getElementById("hPenjualan")
+ .innerText=rp(jual);
+
+ document.getElementById("hModal")
+ .innerText=rp(modal);
+
+ document.getElementById("hLaba")
+ .innerText=rp(laba);
+
+ document.getElementById("hPengeluaran")
+ .innerText=rp(keluar);
+
+ document.getElementById("hBersih")
+ .innerText=rp(laba-keluar);
+
+}
+
+
+/* TANGGAL HARI INI */
+
+(function(){
+
+ let d=new
